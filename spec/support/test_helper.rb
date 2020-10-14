@@ -6,13 +6,13 @@ end
 
 def login_for_request(user)
   post login_path, params: { session: { email: user.email,
-    password: user.password } }
+                                        password: user.password } }
 end
 
 def login_remember(user)
   post login_path, params: { session: { email: user.email,
-    password: user.password,
-    remember_me: '1' } }
+                                        password: user.password,
+                                        remember_me: '1' } }
 end
 
 def current_user
