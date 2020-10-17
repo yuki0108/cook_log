@@ -41,6 +41,10 @@ class User < ApplicationRecord
     update_attribute(:remember_digest, nil)
   end
 
+  def feed
+    Dish.where("user_id = ?", id)
+  end
+
   private
     def downcase_email
       self.email = email.downcase
