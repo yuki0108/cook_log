@@ -29,7 +29,6 @@ RSpec.describe "料理編集", type: :request do
       get edit_dish_path(dish)
       expect(response).to have_http_status "302"
       expect(response).to redirect_to login_path
-      # 更新
       patch dish_path(dish), params: { dish: { name: "イカの塩焼き",
                                                description: "冬に食べたくなる、身体が温まる料理です",
                                                portion: 1.5,
