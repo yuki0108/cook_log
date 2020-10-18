@@ -3,7 +3,7 @@
     <%= link_to(image_tag("header_logo.jpg", :alt => ""), root_url, id: 'logo') %>
     <nav>
       <ul class="nav navbar-nav navbar-right">
-        <li><%= link_to 'トラベルログとは？', about_path %></li>
+        <li><%= link_to 'クックログとは？', about_path %></li>
         <% if logged_in? %>
           <li><%= link_to 'ユーザー一覧', users_path %></li>
           <li class="dropdown">
