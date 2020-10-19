@@ -9,7 +9,7 @@
           <%= f.file_field :picture, accept: 'image/jpeg,image/png', class: 'form-control', id: 'dish-picture' %>
           <%= image_tag(@dish.picture.thumb400.url) if @dish.picture.url.present? %>
         </span>
-        <p></p>
+        <p />
         <div class = 'form-group'>
           <%= f.label :name %>　<span class="input-need">※必須</span>
           <%= f.text_field :name, class: 'form-control', id: 'dish_name' %>
