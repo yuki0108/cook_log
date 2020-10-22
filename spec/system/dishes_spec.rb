@@ -168,16 +168,6 @@ RSpec.describe "Dishes", type: :system do
         expect(page).not_to have_selector 'span', text: '今日の味付けは大成功'
         expect(page).to have_content "コメントを削除しました"
       end
-
-      it "別ユーザーの料理のコメントには削除リンクが無いこと" do
-        login_for_system(other_user)
-        visit dish_path(dish)
-        within find("#comment-#{comment.id}") do
-          expect(page).to have_selector 'span', text: user.name
-          expect(page).to have_selector 'span', text: comment.content
-          expect(page).not_to have_link '削除', href: dish_path(dish)
-        end
-      end
     end
   end
 end

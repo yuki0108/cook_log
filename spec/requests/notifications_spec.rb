@@ -22,5 +22,11 @@ RSpec.describe "通知機能", type: :request do
         expect(response).to redirect_to login_path
       end
     end
+
+    context "通知処理" do
+      before do
+        login_for_request(user)
+      end
+    end
   end
 end
