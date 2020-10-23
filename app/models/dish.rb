@@ -24,6 +24,11 @@ class Dish < ApplicationRecord
     Comment.where("dish_id = ?", dish_id)
   end
 
+  # 料理に付属するログのフィードを作成
+  def feed_log(dish_id)
+    Log.where("dish_id = ?", dish_id)
+  end
+
   private
 
     # アップロードされた画像のサイズを制限する
