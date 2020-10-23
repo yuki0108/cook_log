@@ -34,6 +34,11 @@
       <div class="dish-info">
         <h5>人気度：</h5><h4><%= @dish.popularity %></h4>
       </div>
+      <% if current_user == @dish.user %>
+        <div class="log">
+          <%= render "logs/new" %>
+        </div>
+      <% end %>
       <div class="comment">
         <%= render "comments/feed_comments" %>
         <%= render "comments/new" %>
