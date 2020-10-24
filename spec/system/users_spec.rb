@@ -149,6 +149,10 @@ end
           expect(page).to have_content dish.user.name
           expect(page).to have_content dish.required_time
           expect(page).to have_content "★" * dish.popularity + "☆" * (5 - dish.popularity)
+          dish.ingredients.each do |i|
+            expect(page).to have_content i.name
+            expect(page).to have_content i.quantity
+          end
         end
       end
 
