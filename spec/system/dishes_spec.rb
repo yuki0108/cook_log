@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe "Dishes", type: :system do
   let!(:user) { create(:user) }
-  let!(:dish) { create(:dish, user: user) }
-  let!(:dish) { create(:dish, :picture, user: user) }
+  let!(:other_user) { create(:user) }
+  let!(:dish) { create(:dish, :picture, :ingredients, user: user) }
+  let!(:comment) { create(:comment, user_id: user.id, dish: dish) }
   let!(:log) { create(:log, dish: dish) }
 
   describe "料理登録ページ" do
@@ -24,11 +25,20 @@ RSpec.describe "Dishes", type: :system do
       it "入力部分に適切なラベルが表示されること" do
         expect(page).to have_content '料理名'
         expect(page).to have_content '説明'
+        expect(page).to have_css 'label[for=dish_ingredients_attributes_0_name]',
+                               text: '材料（10種類まで登録可）', count: 1
+        expect(page).to have_css 'label[for=dish_ingredients_attributes_0_quantity]',
+                               text: '量', count: 1
         expect(page).to have_content 'コツ・ポイント'
         expect(page).to have_content '作り方参照用URL'
         expect(page).to have_content '所要時間 [分]'
         expect(page).to have_content '人気度 [1~5]'
         expect(page).to have_content 'クックメモ'
+      end
+
+      it "材料入力部分が10行表示されること" do
+        expect(page).to have_css 'input.ingredient_name', count: 10
+        expect(page).to have_css 'input.ingredient_quantity', count: 10
       end
     end
 
@@ -36,11 +46,12 @@ RSpec.describe "Dishes", type: :system do
       it "有効な情報で料理登録を行うと料理登録成功のフラッシュが表示されること" do
         fill_in "料理名", with: "イカの塩焼き"
         fill_in "説明", with: "冬に食べたくなる、身体が温まる料理です"
-        fill_in "分量", with: 1.5
         fill_in "コツ・ポイント", with: "ピリッと辛めに味付けするのがオススメ"
         fill_in "作り方参照用URL", with: "https://cookpad.com/recipe/2798655"
         fill_in "所要時間", with: 30
         fill_in "人気度", with: 5
+        fill_in "dish[ingredients_attributes][0][name]", with: "豆腐"
+        fill_in "dish[ingredients_attributes][0][quantity]", with: "2個"
         attach_file "dish[picture]", "#{Rails.root}/spec/fixtures/test_dish.jpg"
         click_button "登録する"
         expect(page).to have_content "料理が登録されました！"
@@ -55,7 +66,6 @@ RSpec.describe "Dishes", type: :system do
       it "無効な情報で料理登録を行うと料理登録失敗のフラッシュが表示されること" do
         fill_in "料理名", with: ""
         fill_in "説明", with: "冬に食べたくなる、身体が温まる料理です"
-        fill_in "分量", with: 1.5
         fill_in "コツ・ポイント", with: "ピリッと辛めに味付けするのがオススメ"
         fill_in "作り方参照用URL", with: "https://cookpad.com/recipe/2798655"
         fill_in "所要時間", with: 30
@@ -82,10 +92,17 @@ RSpec.describe "Dishes", type: :system do
         expect(page).to have_content '料理名'
         expect(page).to have_content '説明'
         expect(page).to have_content '分量 [人分]'
+        expect(page).to have_css 'p.title-ingredient-name', text: '材料（10種類まで登録可）', count: 1
+        expect(page).to have_css 'p.title-ingredient-quantity', text: '量', count: 1
         expect(page).to have_content 'コツ・ポイント'
         expect(page).to have_content '作り方参照用URL'
         expect(page).to have_content '所要時間 [分]'
         expect(page).to have_content '人気度 [1~5]'
+      end
+
+      it "材料入力部分が10行表示されること" do
+        expect(page).to have_css 'input.ingredient_name', count: 10
+        expect(page).to have_css 'input.ingredient_quantity', count: 10
       end
     end
 
@@ -98,6 +115,8 @@ RSpec.describe "Dishes", type: :system do
         fill_in "作り方参照用URL", with: "henshu-https://cookpad.com/recipe/2798655"
         fill_in "所要時間", with: 60
         fill_in "人気度", with: 1
+        fill_in "dish[ingredients_attributes][0][name]", with: "編集-豆腐"
+        fill_in "dish[ingredients_attributes][0][quantity]", with: "編集-2個"
         attach_file "dish[picture]", "#{Rails.root}/spec/fixtures/test_dish2.jpg"
         click_button "更新する"
         expect(page).to have_content "料理情報が更新されました！"
@@ -107,6 +126,8 @@ RSpec.describe "Dishes", type: :system do
         expect(dish.reload.reference).to eq "henshu-https://cookpad.com/recipe/2798655"
         expect(dish.reload.required_time).to eq 60
         expect(dish.reload.popularity).to eq 1
+        expect(dish.reload.ingredients.first.name).to eq "編集-豆腐"
+        expect(dish.reload.ingredients.first.quantity).to eq "編集-2個"
         expect(dish.reload.picture.url).to include "test_dish2.jpg"
       end
 
@@ -138,6 +159,10 @@ RSpec.describe "Dishes", type: :system do
         expect(page).to have_content dish.reference
         expect(page).to have_content dish.required_time
         expect(page).to have_content dish.popularity
+        dish.ingredients.each do |i|
+          expect(page).to have_content i.name
+          expect(page).to have_content i.quantity
+        end
         expect(page).to have_link nil, href: dish_path(dish), class: 'dish-picture'
       end
     end
@@ -224,6 +249,102 @@ RSpec.describe "Dishes", type: :system do
           expect(Log.first.content).to eq 'ログ投稿テスト'
           expect(page).to have_content "クックログを追加しました！"
           expect(List.count).to eq 0
+        end
+      end
+    end
+
+      context "検索機能" do
+        context "ログインしている場合" do
+          before do
+            login_for_system(user)
+            visit root_path
+          end
+
+          it "ログイン後の各ページに検索窓が表示されていること" do
+            expect(page).to have_css 'form#dish_search'
+            visit about_path
+            expect(page).to have_css 'form#dish_search'
+            visit use_of_terms_path
+            expect(page).to have_css 'form#dish_search'
+            visit users_path
+            expect(page).to have_css 'form#dish_search'
+            visit user_path(user)
+            expect(page).to have_css 'form#dish_search'
+            visit edit_user_path(user)
+            expect(page).to have_css 'form#dish_search'
+            visit following_user_path(user)
+            expect(page).to have_css 'form#dish_search'
+            visit followers_user_path(user)
+            expect(page).to have_css 'form#dish_search'
+            visit dishes_path
+            expect(page).to have_css 'form#dish_search'
+            visit dish_path(dish)
+            expect(page).to have_css 'form#dish_search'
+            visit new_dish_path
+            expect(page).to have_css 'form#dish_search'
+            visit edit_dish_path(dish)
+            expect(page).to have_css 'form#dish_search'
+          end
+
+          it "フィードの中から検索ワードに該当する結果が表示されること" do
+            create(:dish, name: 'かに玉', user: user)
+            create(:dish, name: 'かに鍋', user: other_user)
+            create(:dish, name: '野菜炒め', user: user)
+            create(:dish, name: '野菜カレー', user: other_user)
+
+            # 誰もフォローしない場合
+            fill_in 'q_name_or_ingredients_name_cont', with: 'かに'
+            click_button '検索'
+            expect(page).to have_css 'h3', text: "”かに”の検索結果：1件"
+            within find('.dishes') do
+              expect(page).to have_css 'li', count: 1
+            end
+            fill_in 'q_name_or_ingredients_name_cont', with: '野菜'
+            click_button '検索'
+            expect(page).to have_css 'h3', text: "”野菜”の検索結果：1件"
+            within find('.dishes') do
+              expect(page).to have_css 'li', count: 1
+            end
+
+            # other_userをフォローする場合
+            user.follow(other_user)
+            fill_in 'q_name_or_ingredients_name_cont', with: 'かに'
+            click_button '検索'
+            expect(page).to have_css 'h3', text: "”かに”の検索結果：2件"
+            within find('.dishes') do
+              expect(page).to have_css 'li', count: 2
+            end
+            fill_in 'q_name_or_ingredients_name_cont', with: '野菜'
+            click_button '検索'
+            expect(page).to have_css 'h3', text: "”野菜”の検索結果：2件"
+            within find('.dishes') do
+              expect(page).to have_css 'li', count: 2
+            end
+
+            # 材料も含めて検索に引っかかること
+          create(:ingredient, name: 'かにの切り身', dish: Dish.first)
+          fill_in 'q_name_or_ingredients_name_cont', with: 'かに'
+          click_button '検索'
+          expect(page).to have_css 'h3', text: "”かに”の検索結果：3件"
+          within find('.dishes') do
+            expect(page).to have_css 'li', count: 3
+          end
+        end
+
+          it "検索ワードを入れずに検索ボタンを押した場合、料理一覧が表示されること" do
+            fill_in 'q_name_or_ingredients_name_cont', with: ''
+            click_button '検索'
+            expect(page).to have_css 'h3', text: "料理一覧"
+            within find('.dishes') do
+              expect(page).to have_css 'li', count: Dish.count
+            end
+          end
+        end
+
+        context "ログインしていない場合" do
+          it "検索窓が表示されないこと" do
+            visit root_path
+            expect(page).not_to have_css 'form#dish_search'
         end
       end
     end
