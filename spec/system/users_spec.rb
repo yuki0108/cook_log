@@ -4,7 +4,7 @@ RSpec.describe "Users", type: :system do
   let!(:user) { create(:user) }
   let!(:admin_user) { create(:user, :admin) }
   let!(:other_user) { create(:user) }
-  let!(:dish) { create(:dish, user: user) }
+  let!(:dish) { create(:dish, :ingredients, user: user) }
   let!(:other_dish) { create(:dish, user: other_user) }
 
   describe "ユーザー一覧ページ" do
@@ -42,6 +42,16 @@ RSpec.describe "Users", type: :system do
   describe "ユーザー登録ページ" do
     before do
       visit signup_path
+    end
+
+    context "ページレイアウト" do
+      it "「ユーザー登録」の文字列が存在することを確認" do
+        expect(page).to have_content 'ユーザー登録'
+      end
+
+      it "正しいタイトルが表示されることを確認" do
+        expect(page).to have_title full_title('ユーザー登録')
+      end
     end
 
     context "ユーザー登録処理" do
@@ -102,15 +112,14 @@ RSpec.describe "Users", type: :system do
       expect(user.reload.email).not_to eq ""
     end
 
-  context "アカウント削除処理", js: true do
-    it "正しく削除できること" do
-      click_link "アカウントを削除する"
-      page.driver.browser.switch_to.alert.accept
-      expect(page).to have_content "自分のアカウントを削除しました"
+    context "アカウント削除処理", js: true do
+      it "正しく削除できること" do
+        click_link "アカウントを削除する"
+        page.driver.browser.switch_to.alert.accept
+        expect(page).to have_content "自分のアカウントを削除しました"
+      end
     end
   end
-end
-
 
   describe "プロフィールページ" do
     context "ページレイアウト" do
