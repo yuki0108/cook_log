@@ -1,19 +1,29 @@
 require 'rails_helper'
 
-RSpec.describe Relationship, type: :model do
-  let!(:relationship) { create(:relationship) }
+RSpec.describe Notification, type: :model do
+  let!(:notification) { create(:notification) }
 
-  it "関係性が有効であること" do
-    expect(relationship).to be_valid
+  it "notificationインスタンスが有効であること" do
+    expect(notification).to be_valid
   end
 
-  it "follower_idがnilの場合、関係性が無効であること" do
-    relationship.follower_id = nil
-    expect(relationship).not_to be_valid
+  it "user_idがnilの場合、無効であること" do
+    notification.user_id = nil
+    expect(notification).not_to be_valid
   end
 
-  it "followed_idがnilの場合、関係性が無効であること" do
-    relationship.followed_id = nil
-    expect(relationship).not_to be_valid
+  it "dish_idがnilの場合、無効であること" do
+    notification.dish_id = nil
+    expect(notification).not_to be_valid
+  end
+
+  it "varietyがnilの場合、無効であること" do
+    notification.variety = nil
+    expect(notification).not_to be_valid
+  end
+
+  it "from_user_idがnilの場合、無効であること" do
+    notification.from_user_id = nil
+    expect(notification).not_to be_valid
   end
 end
