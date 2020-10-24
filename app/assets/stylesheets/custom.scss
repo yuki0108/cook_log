@@ -28,6 +28,18 @@
   font-size: 0px;
 }
 
+//// ページボディ部 ////
+#fh5co-portfolio {
+  padding: 0;
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  h3 {
+    text-align: left;
+  }
+}
+
 //// フッター ////
 #fh5co-footer {
   margin-top: 3em;
@@ -95,6 +107,10 @@ input {
 }
 
 .account-edit {
+  margin-top: 20px;
+}
+
+.account-delete {
   margin-top: 20px;
 }
 
