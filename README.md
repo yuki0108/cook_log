@@ -1,5 +1,5 @@
 # アプリケーションの概要
-作った料理を記録して共有できる、料理投稿SNSサービス。https://originalcooklogapp.herokuapp.com
+作った料理を記録して共有できる、料理投稿SNSサービス。http://original.cooklog.work/
 
 # 技術的ポイント
 ・**RSpec**でModel, Request, Systemテスト記述（計214examples）
@@ -27,4 +27,6 @@
 ■フレームワーク
 　Ruby on Rails
 ■データベース
-　PostgreSQL
+　Sqlite
+■インフラ
+　AWS
