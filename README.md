@@ -27,6 +27,6 @@
 ■フレームワーク
 　Ruby on Rails
 ■データベース
-　Sqlite
+　Postgresql
 ■インフラ
 　AWS

@@ -26,9 +26,9 @@ RSpec.describe "Dishes", type: :system do
         expect(page).to have_content '料理名'
         expect(page).to have_content '説明'
         expect(page).to have_css 'label[for=dish_ingredients_attributes_0_name]',
-                               text: '材料（10種類まで登録可）', count: 1
+                                 text: '材料（10種類まで登録可）', count: 1
         expect(page).to have_css 'label[for=dish_ingredients_attributes_0_quantity]',
-                               text: '量', count: 1
+                                 text: '量', count: 1
         expect(page).to have_content 'コツ・ポイント'
         expect(page).to have_content '作り方参照用URL'
         expect(page).to have_content '所要時間 [分]'
@@ -321,7 +321,7 @@ RSpec.describe "Dishes", type: :system do
               expect(page).to have_css 'li', count: 2
             end
 
-            # 材料も含めて検索に引っかかること
+          # 材料も含めて検索に引っかかること
           create(:ingredient, name: 'かにの切り身', dish: Dish.first)
           fill_in 'q_name_or_ingredients_name_cont', with: 'かに'
           click_button '検索'
@@ -329,7 +329,7 @@ RSpec.describe "Dishes", type: :system do
           within find('.dishes') do
             expect(page).to have_css 'li', count: 3
           end
-        end
+          end
 
           it "検索ワードを入れずに検索ボタンを押した場合、料理一覧が表示されること" do
             fill_in 'q_name_or_ingredients_name_cont', with: ''
@@ -345,9 +345,9 @@ RSpec.describe "Dishes", type: :system do
           it "検索窓が表示されないこと" do
             visit root_path
             expect(page).not_to have_css 'form#dish_search'
+          end
         end
       end
-    end
   end
 
   describe "料理一覧ページ" do

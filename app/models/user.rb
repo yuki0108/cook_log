@@ -110,6 +110,7 @@ class User < ApplicationRecord
   end
 
   private
+
     def downcase_email
       self.email = email.downcase
     end

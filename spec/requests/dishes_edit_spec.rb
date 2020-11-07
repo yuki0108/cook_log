@@ -41,8 +41,9 @@ RSpec.describe "料理編集", type: :request do
                                                popularity: 5,
                                                picture: picture2,
                                                ingredients_attributes: [
-                                               name: "編集-じゃがいも",
-                                               quantity: "編集-2個"] } }
+                                                 name: "編集-じゃがいも",
+                                                 quantity: "編集-2個",
+                                               ] } }
       expect(response).to have_http_status "302"
       expect(response).to redirect_to login_path
     end

@@ -23,7 +23,7 @@ FactoryBot.define do
                                { name: "隠し味", quantity: "7個" },
                                { name: "だし", quantity: "8個" },
                                { name: "ピーマン", quantity: "9個" },
-                               { name: "なす", quantity: "10個" }
+                               { name: "なす", quantity: "10個" },
                              ]
     }
   end
