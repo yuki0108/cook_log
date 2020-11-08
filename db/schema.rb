@@ -107,4 +107,5 @@ ActiveRecord::Schema.define(version: 2020_10_24_031052) do
     t.boolean "notification", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
+
 end
